@@ -156,55 +156,53 @@ class MovieManage(Movie):
         if not movie_dict:
             return
         try:
-            while True:
-                with open(self.file_path, mode="r", newline="") as file:
-                    rows = list(csv.DictReader(file))
+            with open(self.file_path, mode="r", newline="") as file:
+                rows = list(csv.DictReader(file))
+                
+                watchlist_or_rating = input("Would you like to manage your watchlist or ratings? ('w'/'r'): ").strip().lower()
+                if watchlist_or_rating == "w":
+                    select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
                     
-                    watchlist_or_rating = input("Would you like to manage your watchlist or ratings? ('w'/'r'): ").strip().lower()
-                    if watchlist_or_rating == "w":
-                        select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
-                        
-                        if select in ["q", "quit"]:
-                            break
-                        if not select.isdigit() or int(select) not in movie_dict:
-                            print("Please enter a valid number from the list or type 'q' to quit the program.")
-                            continue
+                    if select in ["q", "quit"]:
+                        break
+                    if not select.isdigit() or int(select) not in movie_dict:
+                        print("Please enter a valid number from the list or type 'q' to quit the program.")
+                        continue
 
-                        select = int(select)
-                        selected = movie_dict[select]
-                        status_current = selected["watchlist"]
-                        status_new = "No" if status_current == "Yes" else "Yes"
+                    select = int(select)
+                    selected = movie_dict[select]
+                    status_current = selected["watchlist"]
+                    status_new = "No" if status_current == "Yes" else "Yes"
 
-                        selected["watchlist"] = status_new
-                        print(f"{movie_dict[select]["title"]} watchlist status changed to {status_new}.")
-                    
-                    
-                with open(self.file_path, mode='w', newline='') as file:
-                    fieldnames = rows[0].keys()
-                    writer = csv.DictWriter(file, fieldnames=fieldnames)
-                    writer.writeheader()
-                    writer.writerows(movie_dict.values())
+                    selected["watchlist"] = status_new
+                    print(f"{movie_dict[select]["title"]} watchlist status changed to {status_new}.")
+                
+                
+            with open(self.file_path, mode='w', newline='') as file:
+                fieldnames = rows[0].keys()
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(movie_dict.values())
                     
         except Exception as e:
             print(f"Error occured: {e}.")
 
-    def manage_watch_list(self, rows):
-        if watchlist_or_rating == "w":
-                        select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
-                        
-                        if select in ["q", "quit"]:
-                            break
-                        if not select.isdigit() or int(select) not in movie_dict:
-                            print("Please enter a valid number from the list or type 'q' to quit the program.")
-                            continue
+    def manage_watch_list(self, rows, movie_dict):
+        while True:
+            select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
+            if select in ["q", "quit"]:
+                break
+            if not select.isdigit() or int(select) not in movie_dict:
+                print("Please enter a valid number from the list or type 'q' to quit the program.")
+                continue
 
-                        select = int(select)
-                        selected = movie_dict[select]
-                        status_current = selected["watchlist"]
-                        status_new = "No" if status_current == "Yes" else "Yes"
+            select = int(select)
+            selected = movie_dict[select]
+            status_current = selected["watchlist"]
+            status_new = "No" if status_current == "Yes" else "Yes"
 
-                        selected["watchlist"] = status_new
-                        print(f"{movie_dict[select]["title"]} watchlist status changed to {status_new}.")
+            selected["watchlist"] = status_new
+            print(f"{movie_dict[select]["title"]} watchlist status changed to {status_new}.")
 
 if __name__ == "__main__":
     movie = MovieManage("tadass")
