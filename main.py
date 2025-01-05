@@ -40,7 +40,7 @@ def choices(username):
     while True:
         try:
             message()
-            user_input = int(input())
+            user_input = int(input("\nEnter your choice number(1-5): "))
             if user_input < 1 or user_input > 5:
                 print("Enter a valid choice number (1-5).")
                 continue
@@ -60,7 +60,7 @@ def choices(username):
             pass
         elif user_input == 4:
             pass
-        elif user_input == 5:
+        elif user_input == 5 or user_input in ["exit", "quit", "q"]:
             print("Thanks for using the tool, until next time!")
             break
 

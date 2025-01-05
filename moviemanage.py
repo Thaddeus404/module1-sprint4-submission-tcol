@@ -158,11 +158,13 @@ class MovieManage(Movie):
         with open(self.file_path, mode="r", newline="") as file:
             rows = list(csv.DictReader(file))
         while True:        
-            watchlist_or_rating = input("\nWould you like to manage your watchlist or ratings? ('w'/'r') (type 'q' to quit): ").strip().lower()
+            watchlist_or_rating = input("\nWould you like to manage your watchlist, ratings, or delete a movie from the list? ('w'/'r'/'d') (type 'q' to quit): ").strip().lower()
             if watchlist_or_rating == "w":
                 self.manage_watch_list(rows, movie_dict)
             elif watchlist_or_rating == "r":
                 self.manage_user_rating(rows, movie_dict)
+            elif watchlist_or_rating == "d":
+                self.manage_remove_movie(rows, movie_dict)
             elif watchlist_or_rating in ["q", "quit"]:
                 break
             else:
@@ -173,7 +175,7 @@ class MovieManage(Movie):
         try:
             print("Managing your movie watchlist statuses. Type 'q' to quit.")
             while True:
-                select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
+                select = input("Please select id of the movie that you'd like to add/remove to watchlist or type 'q' to quit: ")
                 if select in ["q", "quit"]:
                     break
                 if not select.isdigit() or int(select) not in movie_dict:
@@ -201,7 +203,7 @@ class MovieManage(Movie):
         try:
             print("Managing your movie ratings. Type 'q' to quit.")
             while True:
-                select = input("Please select id of the movie that you'd like to rate or press 'q' to quit: ")
+                select = input("Please select id of the movie that you'd like to rate or type 'q' to quit: ")
                 if select in ["q", "quit"]:
                     break
                 if not select.isdigit() or int(select) not in movie_dict:
@@ -226,6 +228,29 @@ class MovieManage(Movie):
         except Exception as e:
             print(f"Error occured: {e}.")
 
+    def manage_remove_movie(self, rows, movie_dict):
+        try:
+            print("Movie removal activated. Type 'q' to quit.")
+            while True:
+                select = input("Please select id of the movie that you'd like to remove or type 'q' to quit: ")
+                if select in ["q", "quit"]:
+                    break
+                if not select.isdigit() or int(select) not in movie_dict:
+                    print("Please enter a valid number from the list or type 'q' to quit the program.")
+                    continue
+                select = int(select)
+                selected = movie_dict[select]
+                movie_dict.pop(select)
+                print(f"{selected["title"]} removed from your movie list.")
+
+            with open(self.file_path, mode='w', newline='') as file:
+                fieldnames = rows[0].keys()
+                writer = csv.DictWriter(file, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(movie_dict.values())
+                    
+        except Exception as e:
+            print(f"Error occured: {e}.")
 if __name__ == "__main__":
     movie = MovieManage("tadass")
     movie.manage_movie_list()
