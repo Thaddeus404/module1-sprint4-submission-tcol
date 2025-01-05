@@ -20,3 +20,5 @@ Main Components
    - recommend_movies(): Fetches recommended movies based on a selected movie.
    - manage_movie_list(): Allows users to update their watchlist and ratings or delete movies.
    - save_csv() and load_csv(): Save and load user movie lists from CSV files.
+
+Run this by simply changing your directory to the folder and write python _main.py_ in the terminal
