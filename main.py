@@ -5,8 +5,8 @@ from users import User as usr
 def main():
     username = check_username()
     check_files(username)
-    message()
     choices(username)
+    return
 
 
 
@@ -30,7 +30,7 @@ def message():
     print("1. Open your movie (watch)list.")
     """Opening movie list will allow you to see your movie list and potentially read a synopsis of a movie."""
     print("2. Manage your movie (watch)list.")
-    """Managing movie list will allow you to remove or update movies (watchlist status) in your movie list."""
+    """Managing movie list will allow you to remove or update movies (watchlist status, user rating) in your movie list."""
     print("2. Search for a movie to potentially add to your collection.")
     """Searching for a movie will allow you to add a movie to your movie list."""
     print("3. Get movie recommendations based on your watched movies!")
@@ -39,6 +39,7 @@ def message():
 def choices(username):
     while True:
         try:
+            message()
             user_input = int(input())
             if user_input < 1 or user_input > 5:
                 print("Enter a valid choice number (1-5).")
@@ -50,8 +51,11 @@ def choices(username):
         if user_input == 1:
             see_movie_list = movman(username)
             see_movie_list.open_movie_list()
+            continue
         elif user_input == 2:
-            pass
+            manage_movie_list = movman(username)
+            manage_movie_list.manage_movie_list()
+            continue
         elif user_input == 3:
             pass
         elif user_input == 4:

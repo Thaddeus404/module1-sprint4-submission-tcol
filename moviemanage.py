@@ -158,7 +158,7 @@ class MovieManage(Movie):
         with open(self.file_path, mode="r", newline="") as file:
             rows = list(csv.DictReader(file))
         while True:        
-            watchlist_or_rating = input("Would you like to manage your watchlist or ratings? ('w'/'r') (type 'q' to quit): ").strip().lower()
+            watchlist_or_rating = input("\nWould you like to manage your watchlist or ratings? ('w'/'r') (type 'q' to quit): ").strip().lower()
             if watchlist_or_rating == "w":
                 self.manage_watch_list(rows, movie_dict)
             elif watchlist_or_rating == "r":
