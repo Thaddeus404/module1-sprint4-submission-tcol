@@ -65,7 +65,7 @@ class MovieManage(Movie):
             )
             writer.writeheader()
             writer.writerows(current_movie_list_to_dict)
-        print(f"{self.username} movie list saved successfully.")
+        return True
 
     def access_tmdb(self):
         url = "https://api.themoviedb.org/3/authentication"
@@ -95,7 +95,7 @@ class MovieManage(Movie):
             response = requests.get(url, params=params, headers=headers).json()
 
             if response.get("total_results", 0) == 0:
-                print(f"No movie found with the title `{movie_title}'.")
+                print(f"No movie found with the title '{movie_title}'.")
                 return None
 
             movie_info = response["results"][0]
@@ -120,8 +120,7 @@ class MovieManage(Movie):
                 )
                 self.movies.append(new_movie)
                 if self.save_csv():
-                    print(f"{movie_info["title"]} has been added to your movie list.")
-
+                    print(f"{movie_info["title"]} has been added to your movie list & {self.username} movie list was saved succesfully.")
             else:
                 print(f"{movie_info["title"]} was not added to your movie list.")
         else:
@@ -276,6 +275,76 @@ class MovieManage(Movie):
                     
         except Exception as e:
             print(f"Error occured: {e}.")
+    
+    def recommend_movies(self):
+        if not self.access_tmdb():
+            print("Unable to access TMDb. Check if API key is correctly stored in your environment variables and try again.")
+        self.print_movie_list()
+        
+        which_movie = input("Please select movie ID that you'd like to get movie recommendations based on: ").strip().lower()
+        if which_movie in ["q", "quit"]:
+            print("Exiting movie recommendations.")
+            return
+        
+        if which_movie.isdigit() and int(which_movie) in movie_dict:
+            chosen_movie = movie_dict[int(which_movie)]
+            movie_title = chosen_movie["title"]
+            release_date = chosen_movie["release_date"].strip()
+            print(chosen_movie)
+        
+        #     url = "https://api.themoviedb.org/3/search/movie"
+        #     params = {
+        #         "query": movie_title,
+        #         "primary_release_year": release_date,
+        #         "page": 1,
+        #         }
+        #     headers = {    
+        #         "accept": "application/json",
+        #         "Authorization": f"Bearer {tmdb_api_key}"
+        #     }
+        #     response = requests.get(url, params=params, headers=headers).json()
+        #     if response.get("total_results", 0) == 0:
+        #         print(f"No recommendations are available for {movie_title}.")
+        #         return
+            
+        #     url = "https://api.themoviedb.org/3/movie/{movie_id}/recommendations"
+
+        #     print("\nRecommendations based on your selected movie:\n")
+        #     recommended_movies = response["results"][:5]
+        #     for index, movie_info in enumerate(recommended_movies, 1):
+        #         print(f"{index}. Movie: {movie_info["title"]} ({movie_info["release_date"][:4]}) - TMDb rating: {movie_info["vote_average"]}")
+            
+        #     prompt_confirm = input("Would you like to add any of these movies to your movie list? ('y'/'n'): ").strip().lower()
+
+        #     if prompt_confirm in ["q", "quit"]:
+        #         print("Exiting movie recommendations.")
+        #         return
+        #     if prompt_confirm in ["y", "yes"]:
+        #         while True:
+        #             rec_choice = input("Please select a movie number to add to your movie list: ").strip().lower()
+        #             if rec_choice.isdigit() and 1 <= int(rec_choice) <= 5:
+        #                 rec_movie = recommended_movies[int(rec_choice) - 1]
+        #                 new_movie = Movie(
+        #                     title=rec_movie["title"],
+        #                     release_date=rec_movie["release_date"][:4],
+        #                     rating=rec_movie["vote_average"],
+        #                     overview=rec_movie["overview"],
+        #                     user_rating=None,
+        #                     watchlist="Yes"
+        #                 )
+        #                 self.movies.append(new_movie)
+        #                 if self.save_csv():
+        #                     print(f"{rec_movie["title"]} has been added to your movie list & {self.username} movie list was saved succesfully.")
+        #                     print("Exiting movie recommendations.")
+        #                     return
+        #             else:
+        #                 print("Please enter a valid movie number from the list.")
+        #                 continue
+        # else:
+        #     print("Please enter a valid movie ID from the list.")
+        #     return
+
+
+
 if __name__ == "__main__":
-    movie = MovieManage("tadass")
-    movie.manage_movie_list()
+    ...
