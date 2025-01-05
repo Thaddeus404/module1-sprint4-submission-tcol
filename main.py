@@ -4,13 +4,15 @@ from users import User as usr
 
 def main():
     username = check_username()
+    if not username:
+        print("Exiting program. No username provided.")
+        return
     check_files(username)
     choices(username)
     return
 
 
 def check_username():
-    print("Hello!\nWelcome to your movie list manager!")
     while True:
         username = str(input("Please provide your username: ")).strip().lower()
         if not username:
@@ -18,7 +20,11 @@ def check_username():
         if len(username) < 3:
             print("Username should be at least 3 characters long.")
             continue
-        return username
+        
+        user = usr(username)
+        if user.get_user():
+            return username
+        return False
 
 def check_files(username):
     movie_manager = movman(username)

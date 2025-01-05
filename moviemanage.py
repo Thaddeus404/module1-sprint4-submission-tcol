@@ -133,7 +133,6 @@ class MovieManage(Movie):
         self.check_for_profiles_dir()
         self.check_for_csv()
         user = usr(self.username)
-        user.get_user()
         self.load_csv()
 
     def print_movie_list(self):
