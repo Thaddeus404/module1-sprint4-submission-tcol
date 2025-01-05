@@ -174,6 +174,10 @@ class MovieManage(Movie):
         
 
     def manage_movie_list(self):
+        """manage_movie_list is the main interface for managin movie list, possible options include:
+        1. Changing movie watchlist status to either Yes or No;
+        2. Updating user's ratings;
+        3. Removing the movie from the movie list."""
         movie_dict = self.print_movie_list()
         if not movie_dict:
             return
@@ -278,6 +282,7 @@ class MovieManage(Movie):
             print(f"Error occured: {e}.")
     
     def recommend_movies(self):
+        """Five movie recommendations will be fetched via TMDb API using movie_id from the selected movie (these values should already be stored in username.csv file)."""
         if not self.access_tmdb():
             print("Unable to access TMDb. Check if API key is correctly stored in your environment variables and try again.")
             return
@@ -312,7 +317,6 @@ class MovieManage(Movie):
             }
 
             rec_response = requests.get(rec_url, headers=headers).json()
-
             if rec_response.get("total_results", 0) == 0:
                 print("No recommendations available for this movie.")
                 return
@@ -321,13 +325,14 @@ class MovieManage(Movie):
             rec_movies = rec_response["results"][:5]
             movie_choices = {}
 
-            for index, movie in enumerate(rec_movies, 1):
-                print(f"{index}. {movie["title"]} ({movie["release_date"][:4]}) - TMDb Rating: {movie["vote_average"]}")
-                movie_choices[index] = movie
+            for id, movie in enumerate(rec_movies, 1):
+                print(f"{id}. {movie["title"]} ({movie["release_date"][:4]}) - TMDb Rating: {movie["vote_average"]}")
+                movie_choices[id] = movie
 
             rec_select = input("Enter the number of a recommended movie to add it to your collection or type 'q' to quit: ").strip().lower()
 
             if rec_select in ["q", "quit"]:
+                """git check"""
                 print("Exiting recommendations.")
                 return
 
