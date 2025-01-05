@@ -157,20 +157,21 @@ class MovieManage(Movie):
             return
         with open(self.file_path, mode="r", newline="") as file:
             rows = list(csv.DictReader(file))
-                
-            watchlist_or_rating = input("Would you like to manage your watchlist or ratings? ('w'/'r'): ").strip().lower()
+        while True:        
+            watchlist_or_rating = input("Would you like to manage your watchlist or ratings? ('w'/'r') (type 'q' to quit): ").strip().lower()
             if watchlist_or_rating == "w":
                 self.manage_watch_list(rows, movie_dict)
             elif watchlist_or_rating == "r":
                 self.manage_user_rating(rows, movie_dict)
             elif watchlist_or_rating in ["q", "quit"]:
-                return
+                break
             else:
-                print("Please enter a valid option: either 'w', or 'r'. Alternatiely, type 'q' to quit the program.")
-                
+                print("Please enter a valid option: either 'w', or 'r'. Alternatively, type 'q' to quit the program.")
+        print ("Exiting movie manager.")    
             
     def manage_watch_list(self, rows, movie_dict):
         try:
+            print("Managing your movie watchlist statuses. Type 'q' to quit.")
             while True:
                 select = input("Please select id of the movie that you'd like to add/remove to watchlist or press 'q' to quit: ")
                 if select in ["q", "quit"]:
@@ -198,6 +199,7 @@ class MovieManage(Movie):
 
     def manage_user_rating(self, rows, movie_dict):
         try:
+            print("Managing your movie ratings. Type 'q' to quit.")
             while True:
                 select = input("Please select id of the movie that you'd like to rate or press 'q' to quit: ")
                 if select in ["q", "quit"]:
@@ -205,7 +207,6 @@ class MovieManage(Movie):
                 if not select.isdigit() or int(select) not in movie_dict:
                     print("Please enter a valid number from the list or type 'q' to quit the program.")
                     continue
-
                 select = int(select)
                 selected = movie_dict[select]
                 user_rating = input("Please enter a rating (1-10) for the movie: ")
