@@ -279,7 +279,10 @@ class MovieManage(Movie):
     def recommend_movies(self):
         if not self.access_tmdb():
             print("Unable to access TMDb. Check if API key is correctly stored in your environment variables and try again.")
-        self.print_movie_list()
+
+        movie_dict = self.print_movie_list()
+        if not movie_dict:
+            return
         
         which_movie = input("Please select movie ID that you'd like to get movie recommendations based on: ").strip().lower()
         if which_movie in ["q", "quit"]:
@@ -290,23 +293,25 @@ class MovieManage(Movie):
             chosen_movie = movie_dict[int(which_movie)]
             movie_title = chosen_movie["title"]
             release_date = chosen_movie["release_date"].strip()
-            print(chosen_movie)
-        
-        #     url = "https://api.themoviedb.org/3/search/movie"
-        #     params = {
-        #         "query": movie_title,
-        #         "primary_release_year": release_date,
-        #         "page": 1,
-        #         }
-        #     headers = {    
-        #         "accept": "application/json",
-        #         "Authorization": f"Bearer {tmdb_api_key}"
-        #     }
-        #     response = requests.get(url, params=params, headers=headers).json()
-        #     if response.get("total_results", 0) == 0:
-        #         print(f"No recommendations are available for {movie_title}.")
-        #         return
             
+            url = "https://api.themoviedb.org/3/search/movie"
+            params = {
+                "query": movie_title,
+                "primary_release_year": release_date,
+                "page": 1,
+                }
+            headers = {    
+                "accept": "application/json",
+                "Authorization": f"Bearer {tmdb_api_key}"
+            }
+            response = requests.get(url, params=params, headers=headers).json()
+            if response.get("total_results", 0) == 0:
+                print(f"No recommendations are available for {movie_title}.")
+                return
+            
+            movie_info = response["results"]
+            movie_ids = []
+            print(movie_info)
         #     url = "https://api.themoviedb.org/3/movie/{movie_id}/recommendations"
 
         #     print("\nRecommendations based on your selected movie:\n")

@@ -48,14 +48,17 @@ def choices(username):
         except ValueError:
             print("Enter a valid number!(1-5)")
             continue
+
         if user_input == 1:
             see_movie_list = movman(username)
             see_movie_list.open_movie_list()
             continue
+
         elif user_input == 2:
             manage_movie_list = movman(username)
             manage_movie_list.manage_movie_list()
             continue
+
         elif user_input == 3:
             print("\nMovie search activated.")
             while True:
@@ -78,9 +81,13 @@ def choices(username):
                 search_movies = movman(username)
                 search_movies.search_for_movie(search_tmdb_movie_name, search_tmdb_year_opt) 
                 continue
+
         elif user_input == 4:
-            pass
-        elif user_input == 5 or user_input in ["exit", "quit", "q"]:
+            recommendations = movman(username)
+            recommendations.recommend_movies()
+            continue
+
+        elif user_input in ["exit", "quit", "q", 5]:
             print("Thanks for using the tool, until next time!")
             break
 

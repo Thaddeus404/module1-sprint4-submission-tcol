@@ -26,6 +26,7 @@ class Movie:
             "title": self.title,
             "release_date": self.release_date,
             "rating": self.rating,
+            "overview": self.overview,
             "user_rating": str(self.user_rating) if self.user_rating is not None else "",
             "watchlist": self.watchlist,
         }
