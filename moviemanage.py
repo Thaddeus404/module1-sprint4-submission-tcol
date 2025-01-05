@@ -26,7 +26,7 @@ class MovieManage(Movie):
             with self.file_path.open(mode="w", newline="") as file:
                 writer = csv.DictWriter(
                     file, 
-                    fieldnames=["title", "release_date", "rating", "overview", "user_rating", "watchlist"]
+                    fieldnames=["title", "release_date", "rating", "overview", "movie_id", "user_rating", "watchlist"]
                 )
                 writer.writeheader()
             print(f"A new profile for {self.username} created in profiles folder.")
@@ -61,7 +61,7 @@ class MovieManage(Movie):
         with self.file_path.open(mode="w", newline="") as file:
             writer = csv.DictWriter(
                 file, 
-                fieldnames=["title", "release_date", "rating", "overview", "user_rating", "watchlist"]
+                fieldnames=["title", "release_date", "rating", "overview", "movie_id", "user_rating", "watchlist"]
             )
             writer.writeheader()
             writer.writerows(current_movie_list_to_dict)
@@ -115,6 +115,7 @@ class MovieManage(Movie):
                     release_date=movie_info["release_date"][:4],
                     rating=movie_info["vote_average"],
                     overview=movie_info["overview"],
+                    movie_id=movie_info["id"],
                     user_rating=user_rating,
                     watchlist="No" if user_rating else "Yes"
                 )
@@ -146,7 +147,7 @@ class MovieManage(Movie):
                 
                 print("Your Movie List:")
                 for idx, row in movie_dict.items():
-                    print(f"{idx}. Movie: {row["title"]} ({row["release_date"].strip()}) - Rating: {row["rating"].strip()} - Your Rating: {row["user_rating"]} - Added to watchlist: {row["watchlist"]}")
+                    print(f"{idx}. Movie: {row["title"]} ({row["release_date"].strip()}) - TMDb rating: {row["rating"].strip()} - Your Rating: {row["user_rating"]} - Added to watchlist: {row["watchlist"]}")
         except FileNotFoundError:
             print(f"Filepath {self.file_path} was not found, please check if it exists in your directory.")
             return
@@ -279,76 +280,76 @@ class MovieManage(Movie):
     def recommend_movies(self):
         if not self.access_tmdb():
             print("Unable to access TMDb. Check if API key is correctly stored in your environment variables and try again.")
-
+            return
+        
         movie_dict = self.print_movie_list()
         if not movie_dict:
             return
         
-        which_movie = input("Please select movie ID that you'd like to get movie recommendations based on: ").strip().lower()
-        if which_movie in ["q", "quit"]:
-            print("Exiting movie recommendations.")
-            return
-        
-        if which_movie.isdigit() and int(which_movie) in movie_dict:
-            chosen_movie = movie_dict[int(which_movie)]
-            movie_title = chosen_movie["title"]
-            release_date = chosen_movie["release_date"].strip()
+        while True:
+            select = input("Enter the ID of the movie you'd like to get recommendations based on or type 'q' to quit: ").strip().lower()
+            if select in ["q", "quit"]:
+                print("Exiting movie recommendations mode.")
+                return
             
-            url = "https://api.themoviedb.org/3/search/movie"
-            params = {
-                "query": movie_title,
-                "primary_release_year": release_date,
-                "page": 1,
-                }
-            headers = {    
+            if not select.isdigit() or int(select) not in movie_dict:
+                print(f"Invalid selection. No movies with ID{select} exist.")
+                continue
+
+            selected = movie_dict[int(select)]
+            movie_id = selected.get("movie_id")
+
+            if not movie_id:
+                print("There is an error with fetching movie ID from your movie list, please check if it has been unchanged.")
+                return
+            
+            print(f"Fetching movie recommendations based on: {selected["title"]}. . .")
+
+            rec_url = f"https://api.themoviedb.org/3/movie/{movie_id}/recommendations"
+            headers = {
                 "accept": "application/json",
                 "Authorization": f"Bearer {tmdb_api_key}"
             }
-            response = requests.get(url, params=params, headers=headers).json()
-            if response.get("total_results", 0) == 0:
-                print(f"No recommendations are available for {movie_title}.")
+
+            rec_response = requests.get(rec_url, headers=headers).json()
+
+            if rec_response.get("total_results", 0) == 0:
+                print("No recommendations available for this movie.")
                 return
+
+            print("Recommended Movies:")
+            rec_movies = rec_response["results"][:5]
+            movie_choices = {}
+
+            for index, movie in enumerate(rec_movies, 1):
+                print(f"{index}. {movie["title"]} ({movie["release_date"][:4]}) - TMDb Rating: {movie["vote_average"]}")
+                movie_choices[index] = movie
+
+            rec_select = input("Enter the number of a recommended movie to add it to your collection or type 'q' to quit: ").strip().lower()
+
+            if rec_select in ["q", "quit"]:
+                print("Exiting recommendations.")
+                return
+
+            if rec_select.isdigit() and int(rec_select) in movie_choices:
+                selected_movie = movie_choices[int(rec_select)]
+
+                new_movie = Movie(
+                    title=selected_movie["title"],
+                    release_date=selected_movie["release_date"][:4],
+                    rating=selected_movie["vote_average"],
+                    overview=selected_movie.get("overview", "No synopsis available."),
+                    movie_id=selected_movie["id"],
+                    user_rating=None,
+                    watchlist="Yes"
+                )
+                self.movies.append(new_movie)
+
+                if self.save_csv():
+                    print(f"'{selected_movie["title"]}' has been added to your movie list.")
+            else:
+                print("Invalid selection. Returning to main menu.")
             
-            movie_info = response["results"]
-            movie_ids = []
-            print(movie_info)
-        #     url = "https://api.themoviedb.org/3/movie/{movie_id}/recommendations"
-
-        #     print("\nRecommendations based on your selected movie:\n")
-        #     recommended_movies = response["results"][:5]
-        #     for index, movie_info in enumerate(recommended_movies, 1):
-        #         print(f"{index}. Movie: {movie_info["title"]} ({movie_info["release_date"][:4]}) - TMDb rating: {movie_info["vote_average"]}")
-            
-        #     prompt_confirm = input("Would you like to add any of these movies to your movie list? ('y'/'n'): ").strip().lower()
-
-        #     if prompt_confirm in ["q", "quit"]:
-        #         print("Exiting movie recommendations.")
-        #         return
-        #     if prompt_confirm in ["y", "yes"]:
-        #         while True:
-        #             rec_choice = input("Please select a movie number to add to your movie list: ").strip().lower()
-        #             if rec_choice.isdigit() and 1 <= int(rec_choice) <= 5:
-        #                 rec_movie = recommended_movies[int(rec_choice) - 1]
-        #                 new_movie = Movie(
-        #                     title=rec_movie["title"],
-        #                     release_date=rec_movie["release_date"][:4],
-        #                     rating=rec_movie["vote_average"],
-        #                     overview=rec_movie["overview"],
-        #                     user_rating=None,
-        #                     watchlist="Yes"
-        #                 )
-        #                 self.movies.append(new_movie)
-        #                 if self.save_csv():
-        #                     print(f"{rec_movie["title"]} has been added to your movie list & {self.username} movie list was saved succesfully.")
-        #                     print("Exiting movie recommendations.")
-        #                     return
-        #             else:
-        #                 print("Please enter a valid movie number from the list.")
-        #                 continue
-        # else:
-        #     print("Please enter a valid movie ID from the list.")
-        #     return
-
 
 
 if __name__ == "__main__":
