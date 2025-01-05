@@ -1,5 +1,6 @@
 import csv
 
+
 class Movie:
 
     def __init__(self, title, release_date, rating, overview, movie_id, user_rating=None, watchlist=None):

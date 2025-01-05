@@ -332,7 +332,6 @@ class MovieManage(Movie):
             rec_select = input("Enter the number of a recommended movie to add it to your collection or type 'q' to quit: ").strip().lower()
 
             if rec_select in ["q", "quit"]:
-                """git check"""
                 print("Exiting recommendations.")
                 return
 
@@ -355,7 +354,6 @@ class MovieManage(Movie):
             else:
                 print("Invalid selection. Returning to main menu.")
             
-
 
 if __name__ == "__main__":
     ...

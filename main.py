@@ -9,7 +9,6 @@ def main():
     return
 
 
-
 def check_username():
     print("Hello!\nWelcome to your movie list manager!")
     while True:
@@ -90,7 +89,6 @@ def choices(username):
         elif user_input in ["exit", "quit", "q", 5]:
             print("Thanks for using the tool, until next time!")
             break
-
 
 
 if __name__ == "__main__":
