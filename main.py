@@ -31,9 +31,9 @@ def message():
     """Opening movie list will allow you to see your movie list and potentially read a synopsis of a movie."""
     print("2. Manage your movie (watch)list.")
     """Managing movie list will allow you to remove or update movies (watchlist status, user rating) in your movie list."""
-    print("2. Search for a movie to potentially add to your collection.")
+    print("3. Search for a movie to potentially add to your collection.")
     """Searching for a movie will allow you to add a movie to your movie list."""
-    print("3. Get movie recommendations based on your watched movies!")
+    print("4. Get movie recommendations based on your watched movies!")
     print("5. Exit the program.")
 
 def choices(username):
@@ -57,7 +57,11 @@ def choices(username):
             manage_movie_list.manage_movie_list()
             continue
         elif user_input == 3:
-            pass
+            search_tmdb_movie_name = input("Please enter a movie title to search for: ")
+            search_tmdb_year_opt = input("If you would like to specify the year of movie release, please enter it now (or press Enter to continue without): ")
+            search_movies = movman(username)
+            search_movies.search_for_movie(search_tmdb_movie_name, search_tmdb_year_opt) 
+            continue
         elif user_input == 4:
             pass
         elif user_input == 5 or user_input in ["exit", "quit", "q"]:
