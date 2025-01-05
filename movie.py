@@ -17,7 +17,7 @@ class Movie:
             release_date=row["release_date"],
             rating=float(row["rating"]),
             overview=row.get("overview", ""),
-            user_rating=float(row["user_rating"]) if row.get("user_rating") else None,
+            user_rating=float(row["user_rating"]) if row.get("user_rating") and row["user_rating"].isdigit() else None,
             watchlist=row.get("watchlist")
         )
     
@@ -26,7 +26,7 @@ class Movie:
             "title": self.title,
             "release_date": self.release_date,
             "rating": self.rating,
-            "user_rating": self.user_rating if self.user_rating else "unrated",
+            "user_rating": str(self.user_rating) if self.user_rating is not None else "",
             "watchlist": self.watchlist,
         }
 

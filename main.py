@@ -46,7 +46,7 @@ def choices(username):
                 continue
 
         except ValueError:
-            print("Enter a valid number!(1-999)")
+            print("Enter a valid number!(1-5)")
             continue
         if user_input == 1:
             see_movie_list = movman(username)
@@ -57,19 +57,33 @@ def choices(username):
             manage_movie_list.manage_movie_list()
             continue
         elif user_input == 3:
-            search_tmdb_movie_name = input("Please enter a movie title to search for: ")
-            search_tmdb_year_opt = input("If you would like to specify the year of movie release, please enter it now (or press Enter to continue without): ")
-            search_movies = movman(username)
-            search_movies.search_for_movie(search_tmdb_movie_name, search_tmdb_year_opt) 
-            continue
+            print("\nMovie search activated.")
+            while True:
+                search_tmdb_movie_name = input("Please enter a movie title to search for: ")
+                if search_tmdb_movie_name in ["exit", "quit", "q", "5"]:
+                    break
+                elif search_tmdb_movie_name == "":
+                    print("Please enter a valid movie title.")
+                    continue
+                search_tmdb_year_opt = input("If you would like to specify the year of movie release, please enter it now (or press Enter to continue without): ")
+                if search_tmdb_year_opt:
+                    try:
+                        year = int(search_tmdb_year_opt)
+                        if year <= 1900 or year >= 2025:
+                            print("Please enter a valid year between 1900 and 2025.")
+                            continue
+                    except ValueError:
+                        print("Please enter a valid year (number) - 1900 to 2025.")
+                        continue
+                search_movies = movman(username)
+                search_movies.search_for_movie(search_tmdb_movie_name, search_tmdb_year_opt) 
+                continue
         elif user_input == 4:
             pass
         elif user_input == 5 or user_input in ["exit", "quit", "q"]:
             print("Thanks for using the tool, until next time!")
             break
 
-def add_movie():
-    movie = str(input("Enter t"))
 
 
 if __name__ == "__main__":

@@ -43,18 +43,31 @@ class MovieManage(Movie):
             print(f"Profile for {self.username} doesn't exist.")
 
     def save_csv(self):
+        current_movie_list = []
+        with self.file_path.open(mode="r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                current_movie_list.append(row)
+        
+        current_movie_list_to_dict = [Movie.from_row(row).movie_to_dict() for row in current_movie_list]
+        movie_dupe_check = {movie["title"] for movie in current_movie_list_to_dict}
+        for each_movie in self.movies:
+            if each_movie.movie_to_dict()["title"] not in movie_dupe_check:
+                current_movie_list_to_dict.append(each_movie.movie_to_dict())
+            else:
+                print(f"{each_movie.movie_to_dict()["title"]} already exists in your movie list collection. It has not been added.")
+                return False
+
         with self.file_path.open(mode="w", newline="") as file:
             writer = csv.DictWriter(
                 file, 
-                fieldnames=["title", "release_date", "rating", "user_rating", "watchlist"]
+                fieldnames=["title", "release_date", "rating", "overview", "user_rating", "watchlist"]
             )
             writer.writeheader()
-            for movie in self.movies:
-                writer.writerow(movie.movie_to_dict())
+            writer.writerows(current_movie_list_to_dict)
         print(f"{self.username} movie list saved successfully.")
 
-    @classmethod
-    def access_tmdb(cls):
+    def access_tmdb(self):
         url = "https://api.themoviedb.org/3/authentication"
         headers = {
             "accept": "application/json",
@@ -63,16 +76,18 @@ class MovieManage(Movie):
         response = requests.get(url, headers=headers).json()
         return response["success"]
 
-    @classmethod
-    def search_for_movie(cls, movie_title, year=None):
+    def search_for_movie(self, movie_title, year=None):
         """search_for_movie function searches for a movie using TMDb API and returning movie details (year parameter is optional)."""
-        if cls.access_tmdb():
+        
+        if self.access_tmdb():
             url = "https://api.themoviedb.org/3/search/movie"
             params = {
                 "query": movie_title,
-                "year": year,
                 "page": 1,
             }
+            if year is not None:
+                params["primary_release_year"] = str(year)
+
             headers = {
                 "accept": "application/json",
                 "Authorization": f"Bearer {tmdb_api_key}"
@@ -80,22 +95,22 @@ class MovieManage(Movie):
             response = requests.get(url, params=params, headers=headers).json()
 
             if response.get("total_results", 0) == 0:
-                print(f"No movie found with the title '{movie_title}'.")
+                print(f"No movie found with the title `{movie_title}'.")
                 return None
 
             movie_info = response["results"][0]
             print("\nMovie found! Details below:")
-            print(f"Title: {movie_info['title']}")
-            print(f"Release Date: {movie_info['release_date'][:4]}")
-            print(f"TMDb Rating: {movie_info['vote_average']}")
-            print(f"Synopsis: {movie_info['overview']}")
+            print(f"Title: {movie_info["title"]}")
+            print(f"Release Date: {movie_info["release_date"][:4]}")
+            print(f"TMDb Rating: {movie_info["vote_average"]}")
+            print(f"Synopsis: {movie_info["overview"]}")
 
             prompt_to_add = input("Would you like to add this movie to your Movie Collection? (y/n): ").strip().lower()
-            prompt_user_rating = input("Have you seen this movie? If yes, please rate it (1-10): ").strip()
-
+            
             if prompt_to_add in ["y", "yes"]:
-                user_rating = float(prompt_user_rating) if prompt_user_rating.isdigit() and 1 <= int(prompt_user_rating) <= 10 else None
-                return Movie(
+                prompt_user_rating = input("If you've seen the movie, please rate it (1-10) otherwise, leave this blank: ").strip()
+                user_rating = float(prompt_user_rating) if prompt_user_rating.isdigit() and 1 <= float(prompt_user_rating) <= 10 else None
+                new_movie = Movie(
                     title=movie_info["title"],
                     release_date=movie_info["release_date"][:4],
                     rating=movie_info["vote_average"],
@@ -103,9 +118,15 @@ class MovieManage(Movie):
                     user_rating=user_rating,
                     watchlist="No" if user_rating else "Yes"
                 )
+                self.movies.append(new_movie)
+                if self.save_csv():
+                    print(f"{movie_info["title"]} has been added to your movie list.")
+
+            else:
+                print(f"{movie_info["title"]} was not added to your movie list.")
         else:
             print("Unable to access TMDb. Check if API key is correctly stored in your environment variables and try again.")
-            print(cls.access_tmdb())
+            print(self.access_tmdb())
             return None
 
     def check_reqs(self):
@@ -148,6 +169,7 @@ class MovieManage(Movie):
                 prompt_more = input("For other synopsis, type a movie number. Alternatively, type 'm to see movie list again or type 'q' to quit: ").strip().lower()
             else:
                 print("Please enter a number from the list or type 'q' to quit the program.")
+                continue
 
         
 
@@ -168,7 +190,7 @@ class MovieManage(Movie):
             elif watchlist_or_rating in ["q", "quit"]:
                 break
             else:
-                print("Please enter a valid option: either 'w', or 'r'. Alternatively, type 'q' to quit the program.")
+                print("Please enter a valid option: either 'w', 'r', or 'd'. Alternatively, type 'q' to quit the program.")
         print ("Exiting movie manager.")    
             
     def manage_watch_list(self, rows, movie_dict):
@@ -190,7 +212,7 @@ class MovieManage(Movie):
                 selected["watchlist"] = status_new
                 print(f"{movie_dict[select]["title"]} watchlist status changed to {status_new}.")
 
-            with open(self.file_path, mode='w', newline='') as file:
+            with open(self.file_path, mode="w", newline="") as file:
                 fieldnames = rows[0].keys()
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
@@ -219,7 +241,7 @@ class MovieManage(Movie):
                 selected["user_rating"] = user_rating
                 print(f"{movie_dict[select]["title"]} rating changed to {user_rating}.")
 
-            with open(self.file_path, mode='w', newline='') as file:
+            with open(self.file_path, mode="w", newline="") as file:
                 fieldnames = rows[0].keys()
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
@@ -240,10 +262,13 @@ class MovieManage(Movie):
                     continue
                 select = int(select)
                 selected = movie_dict[select]
+                confirm_deletion = input(f"Please confirm whether you'd really like to remove {selected["title"]} from your movie list ('y'/'n'): ")
+                if confirm_deletion not in ["y", "yes"]:
+                    continue
                 movie_dict.pop(select)
                 print(f"{selected["title"]} removed from your movie list.")
 
-            with open(self.file_path, mode='w', newline='') as file:
+            with open(self.file_path, mode="w", newline="") as file:
                 fieldnames = rows[0].keys()
                 writer = csv.DictWriter(file, fieldnames=fieldnames)
                 writer.writeheader()
