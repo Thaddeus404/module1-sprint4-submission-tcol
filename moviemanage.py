@@ -151,6 +151,33 @@ class MovieManage(Movie):
             print(f"Filepath {self.file_path} was not found, please check if it exists in your directory.")
             return
         return movie_dict
+    
+    def print_watchlist(self):
+        with open(self.file_path, mode="r", newline="") as file:
+            reader = csv.DictReader(file)
+            watchlist_rows = [row for row in reader if row.get("watchlist") == "Yes"]
+
+            if not watchlist_rows:
+                print("Your watchlist is empty. Please add some movies to the watchlist.")
+                return False
+
+            print("Your Watchlist:")
+            watchlist_dict = {index: row for index, row in enumerate(watchlist_rows, 1)}
+            for idx, row in watchlist_dict.items():
+                print(f"{idx}. Movie: {row['title']} ({row['release_date'].strip()}) - TMDb rating: {row['rating'].strip()} - Your Rating: {row['user_rating']}")
+
+        prompt_more = input("If you'd like to read a synopsis of a movie, please enter its number from the list or type 'q' to quit: ").strip().lower()
+
+        while True:
+            if prompt_more in ["q", "quit"]:
+                break
+            if prompt_more.isdigit() and int(prompt_more) in watchlist_dict:
+                chosen_movie = watchlist_dict[int(prompt_more)]
+                print(f"Synopsis for '{chosen_movie['title']}': {chosen_movie['overview']}")
+                prompt_more = input("For other synopsis, type a movie number. Alternatively, type 'm to see movie list again or type 'q' to quit: ").strip().lower()
+            else:
+                print("Please enter a number from the list or type 'q' to quit the program.")
+                continue
 
     def open_movie_list(self):
         movie_dict = self.print_movie_list()

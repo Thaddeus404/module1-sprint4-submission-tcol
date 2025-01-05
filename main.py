@@ -56,8 +56,13 @@ def choices(username):
 
         if user_input == 1:
             see_movie_list = movman(username)
-            see_movie_list.open_movie_list()
-            continue
+            all_movies_or_watchlist = input("Please specify whether you'd like to see your watchlist or all movies ('w'/'a'): ")
+            if all_movies_or_watchlist == "w":
+                see_movie_list.print_watchlist()
+                continue
+            elif all_movies_or_watchlist == "a":
+                see_movie_list.open_movie_list()
+                continue
 
         elif user_input == 2:
             manage_movie_list = movman(username)
