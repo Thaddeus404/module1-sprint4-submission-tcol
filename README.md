@@ -17,6 +17,7 @@ Main Components
 3. **movie.py** (Movie Class): Represents individual movies. Stores attributes like title, release date, TMDb rating, user rating, and watchlist status.
 4. **moviemanage.py** (MovieManage Class): Handles the main movie management logic:
    - search_for_movie(): Searches TMDb for a movie by title and release year (optional).
+   - print_watchlist() and open_movie_list(): Opens movie list (either "to-watch", or all movies from the collection).
    - recommend_movies(): Fetches recommended movies based on a selected movie.
    - manage_movie_list(): Allows users to update their watchlist and ratings or delete movies.
    - save_csv() and load_csv(): Save and load user movie lists from CSV files.
