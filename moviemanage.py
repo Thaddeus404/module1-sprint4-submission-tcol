@@ -166,16 +166,16 @@ class MovieManage(Movie):
             for idx, row in watchlist_dict.items():
                 print(f"{idx}. Movie: {row['title']} ({row['release_date'].strip()}) - TMDb rating: {row['rating'].strip()} - Your Rating: {row['user_rating']}")
 
-        prompt_more = input("If you'd like to read a synopsis of a movie, please enter its number from the list or type 'q' to quit: ").strip().lower()
+        
 
         while True:
+            prompt_more = input("If you'd like to read a synopsis of a movie, please enter its number from the list or type 'q' to quit: ").strip().lower()
             if prompt_more in ["q", "quit"]:
                 break
             if prompt_more.isdigit() and int(prompt_more) in watchlist_dict:
                 chosen_movie = watchlist_dict[int(prompt_more)]
                 print(f"Synopsis for '{chosen_movie['title']}': {chosen_movie['overview']}")
                 prompt_more = input("For other synopsis, type a movie number or type 'q' to quit: ").strip().lower()
-                continue
             else:
                 print("Please enter a number from the list or type 'q' to quit the program.")
                 continue
@@ -184,17 +184,16 @@ class MovieManage(Movie):
         movie_dict = self.print_movie_list()
         if not movie_dict:
             return
-        
-        prompt_more = input("If you'd like to read a synopsis of a movie, please enter its number from the list or type 'q' to quit: ").strip().lower()
+    
         
         while True:
+            prompt_more = input("If you'd like to read a synopsis of a movie, please enter its number from the list or type 'q' to quit: ").strip().lower()
             if prompt_more in ["q", "quit"]:
                 break
             if prompt_more.isdigit() and int(prompt_more) in movie_dict:
                 chosen_movie = movie_dict[int(prompt_more)]
                 print(f"Synopsis for '{chosen_movie["title"]}': {chosen_movie["overview"]}")
                 prompt_more = input("For other synopsis, type a movie number or type 'q' to quit: ").strip().lower()
-                continue
             else:
                 print("Please enter a number from the list or type 'q' to quit the program.")
                 continue
