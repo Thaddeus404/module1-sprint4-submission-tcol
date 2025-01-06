@@ -174,7 +174,8 @@ class MovieManage(Movie):
             if prompt_more.isdigit() and int(prompt_more) in watchlist_dict:
                 chosen_movie = watchlist_dict[int(prompt_more)]
                 print(f"Synopsis for '{chosen_movie['title']}': {chosen_movie['overview']}")
-                prompt_more = input("For other synopsis, type a movie number. Alternatively, type 'm to see movie list again or type 'q' to quit: ").strip().lower()
+                prompt_more = input("For other synopsis, type a movie number or type 'q' to quit: ").strip().lower()
+                continue
             else:
                 print("Please enter a number from the list or type 'q' to quit the program.")
                 continue
@@ -192,7 +193,8 @@ class MovieManage(Movie):
             if prompt_more.isdigit() and int(prompt_more) in movie_dict:
                 chosen_movie = movie_dict[int(prompt_more)]
                 print(f"Synopsis for '{chosen_movie["title"]}': {chosen_movie["overview"]}")
-                prompt_more = input("For other synopsis, type a movie number. Alternatively, type 'm to see movie list again or type 'q' to quit: ").strip().lower()
+                prompt_more = input("For other synopsis, type a movie number or type 'q' to quit: ").strip().lower()
+                continue
             else:
                 print("Please enter a number from the list or type 'q' to quit the program.")
                 continue
